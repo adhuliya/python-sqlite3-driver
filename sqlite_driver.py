@@ -1,22 +1,26 @@
-import sqlite3 
+import sqlite3
 from sqlite_queries import queries
 import logging as log
 
 # logger = log.getLogger(__name__)
 
 class Sqlite3():
-    def __init__(self, dbfile=':memory:', maxfetchlen=0): 
+    def __init__(self, dbfile=':memory:', maxfetchlen=0):
         self.dbfile = dbfile 
         # max number of rows returnded from select statement
         # zero means all
         self.maxfetchlen = maxfetchlen
+
+    def connect(self):
+        err = None
         try:
-            self.conn = sqlite3.connect(dbfile) 
+            self.conn = sqlite3.connect(self.dbfile)
             log.info("Database %s opened.", self.dbfile)
-            self.cur = self.conn.cursor() 
+            self.cur = self.conn.cursor()
         except sqlite3.Error as e:
-            print (e)
-            raise e
+            err = str(e)
+
+        return err
 
 
     """
