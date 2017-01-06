@@ -6,7 +6,7 @@ import logging as log
 class Sqlite3():
     def __init__(self):
         self.dbfile = self.maxfetchlen = None
-        self.conn = self.cur = None
+        self.conn = self.cur = self.queries = None
 
 
     def init(self, dbfile=":memory:", maxfetchlen=0, queries=None):
@@ -14,17 +14,19 @@ class Sqlite3():
         # max number of rows returned from select statement
         # zero means all
         self.maxfetchlen = maxfetchlen
-        try:
-            self.conn = sqlite3.connect(dbfile) 
-            log.info("Database %s opened.", self.dbfile)
-            self.cur = self.conn.cursor() 
-        except sqlite3.Error as e:
-            log.error(e)
-            return str(e)
-
         self.queries = queries
 
-        return None
+    def connect(self):
+        err = None
+        try:
+            self.conn = sqlite3.connect(self.dbfile)
+            log.info("Database %s opened.", self.dbfile)
+            self.cur = self.conn.cursor()
+        except sqlite3.Error as e:
+            log.error(e)
+            err = str(e)
+
+        return err
 
 
 

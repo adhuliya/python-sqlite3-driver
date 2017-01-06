@@ -8,32 +8,30 @@ from sqlite_queries import queries
 from datetime import datetime as dt
 
 
-
 class TestClass(unittest.TestCase):
     def test_create_db(self):
         db = None
         try:
             db = sqld.Sqlite3()
             db.init(queries=queries)
+            db.connect()
         except sqlite3.Error as e:
             log.error(e)
             self.assertTrue(False)
 
-
-        rowcount, err = db.modify('00001')
+        rowcount, err = db.modify('1')
         if err: log.error(err); self.assertTrue(False)
 
-        rowcount, err = db.modify('00002', ("Finish testing", "asleep",
+        rowcount, err = db.modify('2', ("Finish testing", "asleep",
             str(dt.now())))
         if err: log.error(err); self.assertTrue(False)
 
-        rowcount, err = db.modify('00002', ("Packup and go home", "asleep",
+        rowcount, err = db.modify('2', ("Packup and go home", "asleep",
             str(dt.now())))
         if err: log.error(err); self.assertTrue(False)
 
 
-
-        rows, err = db.select('00003')
+        rows, err = db.select('3')
         if err: log.error(err); self.assertTrue(False)
 
         log.debug(rows)
@@ -42,7 +40,7 @@ class TestClass(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    log.basicConfig(filename="log.txt", level=log.DEBUG,
+    log.basicConfig(filename="log.log", level=log.DEBUG,
             format=("[%(asctime)s:%(levelname)8s:%(filename)s:%(lineno)3s"
             " - %(funcName)20s() ]\n %(message)s\n"))
 
