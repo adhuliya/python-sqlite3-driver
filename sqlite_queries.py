@@ -7,13 +7,14 @@ module that refers this module for each query name supplied to it.
 
 """
 
+import re
 """
 This is the only entity present in the file.
 
 Don't add any other entity.
 """
-queries = {
-        "00001":
+_queries = {
+        "1":
         """
         CREATE TABLE IF NOT EXISTS task (
             id INT PRIMARY KEY,
@@ -26,15 +27,29 @@ queries = {
 
         """,
 
-        "00002":
+        "2":
         """
-        INSERT INTO task (task, status, bornon) 
+        INSERT INTO task (task, status, bornon)
         VALUES(?, ?, ?)
         """,
 
-        "00003":
+        "3":
         """
         SELECT * FROM task
         """
         }
+
+def removewhitespace(query):
+    return " ".join(query.split())
+
+def compressqueries():
+    queries = dict()
+    for queryid,query in _queries.items():
+        queries[queryid] = removewhitespace(query)
+
+    return queries
+
+
+queries = compressqueries()
+
 

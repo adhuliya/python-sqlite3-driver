@@ -1,13 +1,17 @@
-import sqlite3 
-from sqlite_queries import queries
+import sqlite3
 import logging as log
 
 # logger = log.getLogger(__name__)
 
 class Sqlite3():
-    def __init__(self, dbfile=':memory:', maxfetchlen=0): 
+    def __init__(self):
+        self.dbfile = self.maxfetchlen = None
+        self.conn = self.cur = None
+
+
+    def init(self, dbfile=":memory:", maxfetchlen=0, queries=None):
         self.dbfile = dbfile 
-        # max number of rows returnded from select statement
+        # max number of rows returned from select statement
         # zero means all
         self.maxfetchlen = maxfetchlen
         try:
@@ -15,8 +19,13 @@ class Sqlite3():
             log.info("Database %s opened.", self.dbfile)
             self.cur = self.conn.cursor() 
         except sqlite3.Error as e:
-            print (e)
-            raise e
+            log.error(e)
+            return str(e)
+
+        self.queries = queries
+
+        return None
+
 
 
     """
@@ -25,19 +34,19 @@ class Sqlite3():
     def select (self, queryid, data=None, maxfetchlen=None): 
         log.info("queryid = %s", queryid)
 
-        if not queryid in queries:
+        if not queryid in self.queries:
             return None, "sqlite_driver: Wrong queryid {}.".format(queryid)
 
         if maxfetchlen == None:
             maxfetchlen = self.maxfetchlen
 
         log.info("queryid=%s, query = [%s], data = [%s], maxfetchlen = [%s]", 
-                queryid, queries[queryid], data, maxfetchlen)
+                queryid, self.queries[queryid], data, maxfetchlen)
 
         if data == None:
-            self.cur.execute (queries[queryid]) 
+            self.cur.execute (self.queries[queryid]) 
         else:
-            self.cur.execute (queries[queryid], data)
+            self.cur.execute (self.queries[queryid], data)
 
         if maxfetchlen == 0:
             return self.cur.fetchall(), None
@@ -51,16 +60,16 @@ class Sqlite3():
     def modify (self, queryid, data=None):
         log.info("queryid = %s", queryid)
 
-        if not queryid in queries:
+        if not queryid in self.queries:
             return None, "sqlite_driver: Wrong queryid {}.".format(queryid)
 
         log.info("queryid=%s, query = [%s], data = [%s]",
-                queryid, queries[queryid], data)
+                queryid, self.queries[queryid], data)
 
         if data == None:
-            self.cur.execute (queries[queryid]) 
+            self.cur.execute (self.queries[queryid]) 
         else:
-            self.cur.execute (queries[queryid], data)
+            self.cur.execute (self.queries[queryid], data)
 
         self.conn.commit()
 
@@ -75,3 +84,5 @@ class Sqlite3():
                 return None
             except sqlite3.Error as e:
                 return str(e)
+
+
